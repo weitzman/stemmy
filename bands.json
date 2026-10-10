@@ -2,21 +2,76 @@
   "phish": {
     "name": "Phish",
     "channels": {
-      "guitar": { "who": "Trey",   "inst": "Guitar" },
-      "bass":   { "who": "Mike",   "inst": "Bass" },
-      "keys":   { "who": "Page",   "inst": "Keys" },
-      "drums":  { "who": "Fish",   "inst": "Drums" },
-      "vocals": { "who": "Vocals", "inst": "Larynx" }
+      "guitar": {
+        "who": "Trey",
+        "inst": "Guitar"
+      },
+      "bass": {
+        "who": "Mike",
+        "inst": "Bass"
+      },
+      "keys": {
+        "who": "Page",
+        "inst": "Keys"
+      },
+      "drums": {
+        "who": "Fish",
+        "inst": "Drums"
+      },
+      "vocals": {
+        "who": "Vocals",
+        "inst": "Larynx"
+      }
     }
   },
   "widespread-panic": {
     "name": "Widespread Panic",
     "channels": {
-      "guitar": { "who": "JB & Mikey",   "inst": "Guitars" },
-      "bass":   { "who": "Schools",      "inst": "Bass" },
-      "keys":   { "who": "JoJo",         "inst": "Keys" },
-      "drums":  { "who": "Todd & Sunny", "inst": "Drums & Perc" },
-      "vocals": { "who": "Vocals",       "inst": "Larynx" }
+      "guitar": {
+        "who": "JB & Mikey",
+        "inst": "Guitars"
+      },
+      "bass": {
+        "who": "Schools",
+        "inst": "Bass"
+      },
+      "keys": {
+        "who": "JoJo",
+        "inst": "Keys"
+      },
+      "drums": {
+        "who": "Todd & Sunny",
+        "inst": "Drums & Perc"
+      },
+      "vocals": {
+        "who": "Vocals",
+        "inst": "Larynx"
+      }
+    }
+  },
+  "goose": {
+    "name": "Goose",
+    "channels": {
+      "guitar": {
+        "who": "Rick",
+        "inst": "Guitar"
+      },
+      "bass": {
+        "who": "Trevor",
+        "inst": "Bass"
+      },
+      "keys": {
+        "who": "Peter",
+        "inst": "Keys"
+      },
+      "drums": {
+        "who": "Cotter",
+        "inst": "Drums"
+      },
+      "vocals": {
+        "who": "Vocals",
+        "inst": "Larynx"
+      }
     }
   }
 }

@@ -4,7 +4,10 @@
     {
       "name": "stemmy",
       "runtimeExecutable": "sh",
-      "runtimeArgs": ["-c", "python3 -m http.server ${PORT:-8765}"],
+      "runtimeArgs": [
+        "-c",
+        "python3 scripts/serve.py ${PORT:-8765}"
+      ],
       "port": 8765,
       "autoPort": true
     }

@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # Add a song to the Split Open player from an archive.org FLAC URL.
 #
-#   scripts/add-song.sh <archive.org flac url> [--title "Song"] [--set "Set II"] [--source "Soundboard"] [--band "Phish"]
+#   scripts/add-song.sh <archive.org flac url> [--title "Song"] [--set "Set II"] [--band "Phish"]
+#
+# The song's "source" in songs.json is the archive.org item page the FLAC
+# came from, https://archive.org/details/<item>.
 #
 # The band defaults to the item's creator; its channel layout (who plays what)
 # must exist in bands.json under the slugified band name.
@@ -26,12 +29,11 @@ BITRATE="128k"
 url="${1:-}"; shift || true
 [[ -n "$url" ]] || { sed -n '2,12p' "$0" | sed 's/^# \{0,1\}//'; exit 1; }
 
-title=""; set_name=""; source_name="Soundboard"; band=""
+title=""; set_name=""; band=""
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --title)  title="$2";       shift 2 ;;
     --set)    set_name="$2";    shift 2 ;;
-    --source) source_name="$2"; shift 2 ;;
     --band)   band="$2";        shift 2 ;;
     *) echo "unknown option: $1" >&2; exit 1 ;;
   esac
@@ -122,7 +124,7 @@ else
     -filter_complex "amix=inputs=2:normalize=0" -c:a libopus -b:a "$BITRATE" "$out/keys.opus"
 fi
 
-python3 - "$ROOT/songs.json" "$meta" "$id" "$set_name" "$source_name" <<'PY'
+python3 - "$ROOT/songs.json" "$meta" "$id" "$set_name" "https://archive.org/details/$item" <<'PY'
 import json, sys
 path, meta, id_, set_name, source = sys.argv[1:]
 meta = json.loads(meta)

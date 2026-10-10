@@ -5,9 +5,9 @@
     "title": "Funky Bitch",
     "date": "1998-07-26",
     "set": "Set I",
-    "venue": "Coca-Cola Starplex Amphitheater",
+    "venue": "Coca-Cola Starplex",
     "city": "Dallas, TX",
-    "source": "Soundboard",
+    "source": "https://archive.org/details/phish_1998-07-26_SBD_RM26",
     "dir": "audio/songs/1998-07-26-funky-bitch/"
   },
   {
@@ -18,8 +18,9 @@
     "set": "Set II",
     "venue": "Crest Theater",
     "city": "Sacramento, CA",
-    "source": "Soundboard",
-    "dir": "audio/songs/1993-03-22-mikes-song/"
+    "source": "https://archive.org/details/phish1993-03-22.001399.sacramento.sbd.flac1644",
+    "dir": "audio/songs/1993-03-22-mikes-song/",
+    "hidden": true
   },
   {
     "id": "1997-03-29-wonderin",
@@ -29,7 +30,18 @@
     "set": "Set I",
     "venue": "Warfield Theater",
     "city": "San Francisco, CA",
-    "source": "Soundboard",
+    "source": "https://archive.org/details/wsp1997-03-29.sbd.flac16",
     "dir": "audio/songs/1997-03-29-wonderin/"
+  },
+  {
+    "id": "2025-10-04-thatch",
+    "band": "goose",
+    "title": "Thatch",
+    "date": "2025-10-04",
+    "set": "Set II",
+    "venue": "The Mann",
+    "city": "Philadelphia, PA",
+    "source": "https://www.youtube.com/watch?v=Qg6W8F10RrY&t=8566s",
+    "dir": "audio/songs/2025-10-04-thatch/"
   }
 ]

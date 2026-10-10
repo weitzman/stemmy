@@ -1,0 +1,8 @@
+title: Solos
+lang: en
+by: Moshe Weitzman
+0:03.1 solo=drums to=0:21.5 | Fish sets us up with a steady beat
+0:30 solo=bass | Part 1 of a funky ass bass line
+0:57.2 solo=bass to=1:23.8 | Part 2 of the funky ass bass line
+1:53.8 solo=keys to=2:21.8 | The Chairman of the Boards
+3:57.9 solo=guitar to=4:54.8 | Blues guitar suits Trey

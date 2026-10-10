@@ -75,15 +75,49 @@ h1 {
   color: var(--text);
   text-shadow: 0 0 24px rgba(242, 177, 52, 0.25);
 }
-.venue { color: var(--muted); font-size: 14px; }
-
-.songs {
-  display: flex;
+/* The title is the song picker: the words plus a chevron that brightens on hover. */
+.song-pick {
+  display: inline-flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  margin-top: 16px;
+  align-items: center;
+  gap: 0.15em;
+  padding: 0 0.1em;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  text-shadow: inherit;
+  cursor: pointer;
+  border-radius: 12px;
 }
+/* The pill beside the title says there are more songs and opens the picker. */
+.pick-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 0.25em;
+  padding: 6px 12px 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--gold);
+  background: rgba(242, 177, 52, 0.12);
+  color: var(--gold);
+  font: 600 14px Inter, sans-serif;
+  letter-spacing: 0;
+  text-shadow: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: background 0.15s, color 0.15s;
+}
+.pick-pill[hidden] { display: none; }
+.pick-pill .chevron { width: 16px; height: 16px; transition: transform 0.15s; }
+.song-pick:hover .pick-pill, .song-pick:focus-visible .pick-pill { background: var(--gold); color: #1a1200; }
+.song-pick:hover .chevron { transform: translateY(2px); }
+.song-pick:focus-visible { outline: 2px solid var(--gold); outline-offset: 4px; }
+.song-row:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.venue { color: var(--muted); font-size: 14px; }
+
 .song {
   font: 600 13px Inter, sans-serif;
   padding: 8px 14px;
@@ -97,6 +131,24 @@ h1 {
 .song.on { background: var(--gold); border-color: var(--gold); color: #1a1200; }
 .song small { opacity: 0.7; font-weight: 400; margin-left: 6px; }
 
+/* Guides for this song: a labeled row of chips in the song-list style. */
+.guides {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+.guides:empty { display: none; }
+.guides-label {
+  color: var(--muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin-right: 4px;
+}
+
 .loading { text-align: center; color: var(--muted); font-size: 14px; }
 .loading-bar {
   margin: 10px auto 0;
@@ -109,6 +161,7 @@ h1 {
 .loading-fill { height: 100%; width: 0%; background: var(--gold); transition: width 0.15s; }
 
 /* Mixer */
+.mixer[hidden] { display: none; }
 .mixer {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -242,7 +295,6 @@ h1 {
   .logo { align-self: center; margin-bottom: 0; }
   .show { padding-top: 0; }
   h1 { margin: 0 0 4px; }
-  .songs { margin-top: 10px; }
   .mixer { grid-template-columns: 1fr; gap: 6px; }
   .strip {
     position: relative;
@@ -273,6 +325,355 @@ h1 {
     background: linear-gradient(to right, var(--c), var(--gold) 80%, var(--donut));
   }
 }
+
+/* Guide panel: the current note up top, the list of tips beneath. */
+.guide[hidden] { display: none; }
+.guide {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.guide-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.guide-kicker {
+  color: var(--gold);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.guide-title {
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 18px;
+  flex: 1 0 auto; /* never squeezed; on a phone the controls wrap below */
+}
+.guide-by { color: inherit; }
+a.guide-by { text-decoration: underline; text-underline-offset: 3px; }
+a.guide-by:hover { color: var(--gold); }
+/* Edit / Save keeps one spot, beside the close button, in every mode. */
+.btn.guide-edit { margin-left: auto; }
+.btn.guide-edit[hidden] + .btn.guide-close { margin-left: auto; }
+.btn.guide-close {
+  min-width: 34px;
+  padding: 0;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--muted);
+}
+.guide-status { margin: 0; color: var(--muted); font-size: 14px; }
+.guide-status.error { color: var(--donut); }
+.guide-status .inline-icon { width: 15px; height: 15px; vertical-align: -3px; }
+.guide-status[hidden] { display: none; }
+.guide-head .btn[hidden] { display: none; }
+
+/* Writing a guide. The tip list is one compact line per tip: handle, mix,
+   start (and a quiet optional end), then edit / play / delete, with the
+   first line of the note beneath. */
+.edit-row input[type="text"], .times input, .edit-note {
+  min-width: 0;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.25);
+  color: var(--text);
+  font: 16px Inter, sans-serif; /* 16px: below that, iOS Safari zooms the page when the field is focused */
+}
+.times input:focus, .edit-note:focus { outline: 1px solid var(--gold); }
+.guide.editing .guide-tips { max-height: 60vh; }
+.icon {
+  width: 30px;
+  height: 30px;
+  padding: 6px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+}
+.icon svg { width: 16px; height: 16px; }
+.icon:hover { background: rgba(255,255,255,0.12); }
+li.looping .icon.loop { background: var(--gold); border-color: var(--gold); color: #1a1200; }
+.mini {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font: 600 12px Inter, sans-serif;
+  cursor: pointer;
+}
+.mini:hover { background: rgba(255,255,255,0.12); }
+.edit-note { width: 100%; resize: vertical; line-height: 1.4; }
+.song.chip.new { background: none; border-style: dashed; color: var(--muted); }
+.song.chip.new:hover { color: var(--text); }
+.handle {
+  cursor: grab;
+  color: var(--muted);
+  font-size: 16px;
+  letter-spacing: -4px;
+  padding: 0 4px 0 0;
+  user-select: none;
+  touch-action: none;
+}
+.guide-tips li.dragging { opacity: 0.6; background: rgba(242, 177, 52, 0.12); }
+.guide-tips li.dragging .handle { cursor: grabbing; }
+
+/* Editing one tip: the list and mixer step aside for its times and note. */
+.guide.tip-editing .guide-tips { max-height: none; overflow: visible; }
+.guide-tips li.tip-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 0;
+  color: var(--text);
+}
+/* Start and End sit in one grid so their values and Set buttons line up. */
+.tip-editor .times {
+  display: grid;
+  grid-template-columns: max-content max-content max-content max-content;
+  justify-content: start;
+  align-items: center;
+  gap: 8px 10px;
+  font-size: 14px;
+}
+.tip-editor .time-row { display: contents; }
+.tip-editor .time-row .time-label { grid-column: 1; } /* each row starts at the label */
+.tip-editor .scrub-hint { grid-column: 1 / -1; }
+.tip-editor .time-row.opt .time-label { color: var(--muted); }
+.tip-editor .time-value { font-variant-numeric: tabular-nums; min-width: 3.5em; font-size: 16px; }
+.tip-editor .time-value.unset { color: var(--muted); }
+.tip-editor .clear-to:disabled { opacity: 0.35; cursor: default; }
+.tip-editor .mini.quiet { color: var(--muted); }
+.tip-editor .scrub-hint { font-size: 12px; color: var(--muted); }
+.marks i.editing { opacity: 1; background: var(--gold); box-shadow: 0 0 6px rgba(242, 177, 52, 0.7); }
+.tip-editor .actions { display: flex; gap: 8px; align-items: center; }
+.tip-editor .btn.save { background: var(--gold); border-color: var(--gold); color: #1a1200; }
+.tip-editor .btn.loop { display: inline-flex; align-items: center; gap: 6px; }
+.tip-editor .btn.loop svg { width: 14px; height: 14px; fill: currentColor; }
+.tip-editor.looping .btn.loop { background: var(--gold); border-color: var(--gold); color: #1a1200; }
+.tip-editor .btn.discard { color: var(--muted); margin-left: auto; }
+.tip-editor .mix-btn {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 6px 10px;
+  margin: -6px -10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+.tip-editor .mix-btn:hover { background: rgba(255,255,255,0.06); }
+.tip-editor .mix-hint { font-size: 12px; color: var(--gold); text-decoration: underline; text-underline-offset: 2px; }
+
+/* Sheets: modals that drop in on desktop and rise from the bottom on
+   phones. The mix sheet has one row per player; the song sheet lists the
+   songs by band with a search box. */
+.sheet {
+  width: min(440px, calc(100vw - 32px));
+  padding: 18px 18px 16px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-2);
+  color: var(--text);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+}
+.sheet::backdrop { background: rgba(5, 8, 24, 0.7); }
+.sheet:focus { outline: none; } /* the sheet takes focus on phones; no ring for that */
+.song-sheet { width: min(520px, calc(100vw - 32px)); max-height: min(80vh, 720px); display: none; flex-direction: column; }
+.song-sheet[open] { display: flex; }
+.sheet-head { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; margin-bottom: 10px; }
+.sheet-head .sheet-title { margin: 0; }
+.sheet-search {
+  flex: 1;
+  min-width: 160px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: rgba(0,0,0,0.25);
+  color: var(--text);
+  font: 16px Inter, sans-serif; /* 16px: below that, iOS Safari zooms the page when the field is focused */
+}
+.sheet-search:focus { outline: 1px solid var(--gold); }
+.song-list { overflow-y: auto; min-height: 0; margin: 0 -6px; padding: 0 6px; }
+.song-band {
+  margin: 12px 6px 4px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+.song-band:first-child { margin-top: 2px; }
+.song-row {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  text-align: left;
+  cursor: pointer;
+}
+.song-row:hover { background: rgba(255,255,255,0.06); }
+.song-row.on { background: rgba(242, 177, 52, 0.14); }
+.song-row.on .song-title { color: var(--gold); }
+.song-title { font: 600 15px Inter, sans-serif; }
+.song-where { font-size: 12px; color: var(--muted); }
+.song-none { margin: 16px 6px; color: var(--muted); font-size: 14px; }
+.sheet-title {
+  margin: 0 0 12px;
+  font-family: "Space Grotesk", Inter, sans-serif;
+  font-size: 18px;
+}
+.sheet-rows { display: flex; flex-direction: column; gap: 6px; }
+.sheet-row {
+  --c: var(--gold);
+  cursor: pointer;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border: 2px solid var(--c);
+  border-radius: 10px;
+  background: var(--panel);
+  transition: opacity 0.15s;
+}
+.sheet-row.inactive { opacity: 0.45; }
+.sheet-row .btn[hidden] { display: none; }
+.sheet-row .who { font-family: "Space Grotesk", Inter, sans-serif; font-size: 18px; color: var(--c); line-height: 1; }
+.sheet-row .inst { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.12em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sheet-actions { display: flex; align-items: center; gap: 8px; margin-top: 14px; }
+.sheet-actions .spacer { flex: 1; }
+.sheet-actions .btn.use { background: var(--gold); border-color: var(--gold); color: #1a1200; }
+@media (max-width: 720px) {
+  .sheet {
+    position: fixed;
+    inset: auto 0 0 0;
+    width: 100%;
+    max-width: none;
+    margin: 0;
+    border-radius: 16px 16px 0 0;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+  .song-sheet { max-height: 85vh; }
+}
+
+/* The tip editor's head: the mix label as a button. */
+.card-head { display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.card-head .mix .who { font-family: "Space Grotesk", Inter, sans-serif; font-size: 16px; }
+.mini {
+  height: 28px;
+  min-width: 28px;
+  padding: 0 8px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  font: 600 12px Inter, sans-serif;
+  cursor: pointer;
+}
+.mini:hover { background: rgba(255,255,255,0.12); }
+.edit-note { width: 100%; resize: vertical; line-height: 1.4; }
+.song.chip.new { background: none; border-style: dashed; color: var(--muted); }
+.song.chip.new:hover { color: var(--text); }
+
+/* Long notes are clamped to a few lines, with a "more" link that shows the
+   rest; the link only appears when there is more. */
+.note.clamp {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: var(--lines, 2);
+  line-clamp: var(--lines, 2);
+  overflow: hidden;
+}
+.more {
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--gold);
+  font: 600 13px Inter, sans-serif;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.more[hidden] { display: none; }
+
+.btn.continue {
+  align-self: flex-start;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #1a1200;
+}
+.guide-tips {
+  position: relative; /* so each tip's offsetTop is measured from the list */
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+/* Tip rows, read or written alike: mix and times on the first line, the
+   note beneath clamped behind "more". Writing adds a handle on the left
+   and edit / play / delete on the right. */
+.guide-tips li.tip-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas: "jump" "note" "more";
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 2px;
+  padding: 7px 6px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 14px;
+}
+.guide-tips li.tip-row.edit {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-areas: "handle jump actions" "handle note note" "handle more more";
+}
+.guide-tips li.tip-row.on { background: rgba(255,255,255,0.05); color: var(--text); }
+.guide-tips li.tip-row .handle { grid-area: handle; }
+.guide-tips li.tip-row .jump {
+  grid-area: jump;
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.guide-tips li.tip-row .mix { color: var(--text); min-width: 0; }
+.guide-tips li.tip-row .mix .who { font-family: "Space Grotesk", Inter, sans-serif; font-size: 15px; }
+.guide-tips li.tip-row .when { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--text); }
+.guide-tips li.tip-row .when .to { color: var(--muted); }
+.guide-tips li.tip-row.on .when .at { color: var(--gold); }
+.guide-tips li.tip-row .actions { grid-area: actions; display: inline-flex; gap: 4px; }
+.guide-tips li.tip-row .note { grid-area: note; }
+.guide-tips li.tip-row .note[hidden] { display: none; }
+.guide-tips li.tip-row .more { grid-area: more; justify-self: start; }
 
 /* Transport */
 .transport {
@@ -306,7 +707,32 @@ h1 {
 .play.playing .icon-pause { display: block; }
 
 .time { font-variant-numeric: tabular-nums; color: var(--muted); font-size: 14px; min-width: 44px; text-align: center; }
+.seek-wrap { flex: 1; min-width: 0; position: relative; display: flex; align-items: center; }
 .seek { flex: 1; min-width: 0; accent-color: var(--gold); cursor: pointer; }
+/* Guide tips are marked over the seek bar: a span for the passage (a tick
+   when it runs to the next tip). The marks are decoration only; every
+   pointer goes to the seek bar beneath, so it can be dragged anywhere. The
+   row is inset by half the thumb so the marks line up with the thumb. */
+.marks {
+  position: absolute;
+  left: 8px;
+  right: 8px;
+  top: 50%;
+  height: 12px;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.marks i {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  margin-left: -1px;
+  background: var(--gold);
+  opacity: 0.6;
+  border-radius: 1px;
+}
+.marks i.on { opacity: 1; }
 /* Share icon, in the style of GitHub's small clipboard buttons. Where there
    is no share sheet the link is copied instead, and the glyph gives way to a
    check for a moment, or turns red if the copy failed. */
@@ -389,6 +815,7 @@ kbd {
 .btn.solo.hint {
   animation: solo-glow 2.4s ease-in-out infinite;
 }
+
 @keyframes solo-glow {
   0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); border-color: var(--line); }
   50%      { box-shadow: 0 0 8px color-mix(in srgb, var(--c) 45%, transparent); border-color: color-mix(in srgb, var(--c) 60%, var(--line)); }

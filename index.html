@@ -46,9 +46,16 @@
     <span class="logo-text">Split Open</span>
   </a>
   <header class="show">
-    <h1 id="title">Split Open</h1>
+    <h1>
+      <button class="song-pick" id="song-pick" title="Choose a song (/)" aria-haspopup="dialog">
+        <span id="title">Split Open</span>
+        <span class="pick-pill" id="pick-pill" hidden><span id="pick-count"></span>
+          <svg class="chevron" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+        </span>
+      </button>
+    </h1>
     <div class="venue" id="venue"></div>
-    <nav class="songs" id="songs" aria-label="Songs"></nav>
+    <nav class="guides" id="guides" aria-label="Guides"></nav>
   </header>
 
   <section class="loading" id="loading">
@@ -58,13 +65,29 @@
 
   <section class="mixer" id="mixer" hidden></section>
 
+  <section class="guide" id="guide" hidden>
+    <div class="guide-head">
+      <span class="guide-kicker" id="guide-kicker">Guide</span>
+      <span class="guide-title" id="guide-title"></span>
+      <button class="btn guide-add" id="guide-add" title="Start a tip here, with the current mix (N)" hidden>Tip: Start</button>
+      <button class="btn guide-edit" id="guide-edit" title="Copy this guide into one of your own and change it">Copy &amp; edit</button>
+      <button class="btn guide-close" id="guide-close" aria-label="Close guide">&times;</button>
+    </div>
+    <p class="guide-status" id="guide-status" hidden></p>
+    <button class="btn continue" id="guide-continue" hidden>Continue</button>
+    <ol class="guide-tips" id="guide-tips"></ol>
+  </section>
+
   <section class="transport" id="transport" hidden>
     <button class="play" id="play" aria-label="Play">
       <svg class="icon-play" viewBox="0 0 24 24"><path d="M7 4l14 8-14 8z"/></svg>
       <svg class="icon-pause" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
     </button>
     <div class="time" id="time-cur">0:00</div>
-    <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
+    <div class="seek-wrap">
+      <div class="marks" id="marks" aria-hidden="true"></div>
+      <input class="seek" id="seek" type="range" min="0" max="1000" value="0" step="1" aria-label="Seek">
+    </div>
     <div class="time" id="time-dur">0:00</div>
     <button class="btn share" id="share" title="Share a link to this mix and moment (L)" aria-label="Share mix">
       <svg class="icon-share" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10H6.5A1.5 1.5 0 0 0 5 11.5v8A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5v-8a1.5 1.5 0 0 0-1.5-1.5H16"/><path d="M12 15V3M8 7l4-4 4 4"/></svg>
@@ -76,10 +99,31 @@
     <span><kbd>space</kbd> play / pause</span>
     <span><kbd>1</kbd>–<kbd>5</kbd> solo</span>
     <span><kbd>←</kbd> <kbd>→</kbd> ±5 s</span>
+    <span><kbd>/</kbd> choose a song</span>
     <span><kbd>L</kbd> share mix</span>
+    <span><kbd>N</kbd> add a tip</span>
     <p class="colophon">Split Open so we can learn and appreciate. By <a href="https://weitzman.github.io">Moshe Weitzman</a>.</p>
   </footer>
 </main>
+
+<dialog class="sheet song-sheet" id="song-sheet" aria-labelledby="song-sheet-title" tabindex="-1">
+  <div class="sheet-head">
+    <h2 class="sheet-title" id="song-sheet-title">Songs</h2>
+    <input class="sheet-search" id="song-search" type="search" placeholder="Search songs, bands, venues" aria-label="Search songs" autocomplete="off">
+  </div>
+  <div class="song-list" id="song-list"></div>
+</dialog>
+
+<dialog class="sheet mix-sheet" id="mix-sheet" aria-labelledby="mix-sheet-title">
+  <h2 class="sheet-title" id="mix-sheet-title">Mix for this tip</h2>
+  <div class="sheet-rows" id="mix-sheet-rows"></div>
+  <div class="sheet-actions">
+    <button class="more" id="mix-sheet-full" type="button">Full mix</button>
+    <span class="spacer"></span>
+    <button class="btn" id="mix-sheet-cancel" type="button">Cancel</button>
+    <button class="btn use" id="mix-sheet-use" type="button">Use this mix</button>
+  </div>
+</dialog>
 
 <script src="app.js"></script>
 </body>
